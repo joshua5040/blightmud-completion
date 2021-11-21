@@ -8,7 +8,7 @@ Blightmud tab completion plugin
 Note: This plugin locks completions so the default Blightmud completions will not work.
 
 ## Planned Features
-- Context-aware completions for all blightmud commands.
+- Context-aware completions for all Blightmud commands.
 - Settings to change the mud output buffer length and enable/disable specific completions.
 
 ## Installation
