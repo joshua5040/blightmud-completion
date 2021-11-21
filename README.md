@@ -13,4 +13,4 @@ Note: This plugin locks completions so the default Blightmud completions will no
 
 ## Installation
 In Blightmud:
-'/add_plugin https://github.com/joshua5040/blightmud-completion.git'
+`/add_plugin https://github.com/joshua5040/blightmud-completion.git`
