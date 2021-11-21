@@ -51,4 +51,4 @@ local function complete(input)
   return completions
 end
 
-blight.on_complete(complete)
+blight.on_complete(complete, true)
