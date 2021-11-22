@@ -10,15 +10,30 @@ trigger.add("^(.+)$", {}, function(_, line)
     output_history[output_history.last] = line:line()
 end)
 
+local function complete_setting(input)
+  local partial_setting_re = regex.new("(\\w+)$")
+  local partial_setting_matches = partial_setting_re:match(input) or ""
+  local partial_setting = partial_setting_matches[1] or ""
+  --blight.output(partial_setting)
+  local completions = {}
+  for k, _ in pairs(settings.list()) do
+    if k:match("^" .. partial_setting) then
+      --blight.output("/set " .. k)
+      table.insert(completions, "/set " .. k)
+    end
+  end
+  return completions
+end
+
 local function complete_filepath(partial_path, prefix)
-  local prefix = prefix or ''
+  local prefix = prefix or ""
   local completions = {}
   local response = core.exec("compgen -f " .. partial_path)
   for line in response:stdout():gmatch("([^\n]+)") do
-    if core.exec('file ' .. line):stdout():match('directory') then
-      table.insert(completions, prefix .. line .. '/')
+    if core.exec("file " .. line):stdout():match("directory") then
+      table.insert(completions, prefix .. line .. "/")
     else
-      table.insert(completions, prefix .. line .. ' ')
+      table.insert(completions, prefix .. line .. " ")
     end
   end
   return completions
@@ -44,17 +59,21 @@ local function complete_on_mud_output(input)
 end
 
 local function complete(input)
-  local partial_blightmud_command_re = regex.new('^/[\\w]+$')
-  local file_command_re = regex.new('(^/load |^/add_plugin )([^\n]+|)$')
-  local file_command_matches = file_command_re:match(input)
+  local partial_blightmud_command_re = regex.new("^/\\w+$")
+  local file_command_re = regex.new("(^/load |^/add_plugin )([^\n]+|)$")
+  local set_command_re = regex.new("^/set (?:[^\n]+|$)")
   local lock = true
   local completions = {}
   if partial_blightmud_command_re:test(input) then
     lock = false
   elseif file_command_re:test(input)  then
+    local file_command_matches = file_command_re:match(input)
     local filepath = file_command_matches[3]
     local command = file_command_matches[2]
     completions = complete_filepath(filepath, command)
+  elseif set_command_re:test(input) then
+    local set_command_matches = file_command_re:match(input)
+    completions = complete_setting(input)
   else
     completions = complete_on_mud_output(input)
   end
