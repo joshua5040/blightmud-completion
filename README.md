@@ -2,10 +2,10 @@
 Blightmud tab completion plugin
 
 ## Features
-- Filepath completion for the '/load' command.
+- Filepath completion for the `/load` and `/add_plugin` commands.
 - Completion on the last 100 lines of the mud output.
 
-Note: This plugin locks completions so the default Blightmud completions will not work.
+Note: This plugin locks completions so some of the default Blightmud completions will not work.
 
 ## Planned Features
 - Context-aware completions for all Blightmud commands.
