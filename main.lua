@@ -26,15 +26,17 @@ end
 
 local function complete_on_mud_output(input)
   local partial_word = regex.new("(\\w+)$")
-  local partial_word_match = partial_word:match(input)[1]
-  local complete_word = regex.new("\\b(" .. partial_word_match .. "\\w+)")
-  local input_start = string.sub(input,1, #input - #partial_word_match)
+  local partial_word_match = partial_word:match(input)
   local completions = {}
-  for i = output_history.last, output_history.first, -1 do
-    local complete_word_matches = complete_word:match(output_history[i])
-    if complete_word_matches then
-      for j = #complete_word_matches, 1, -1 do
-        table.insert(completions, input_start .. complete_word_matches[j])
+  if partial_word_match then
+    local complete_word = regex.new("\\b(" .. partial_word_match[1] .. "\\w+)")
+    local input_start = string.sub(input,1, #input - #partial_word_match[1])
+    for i = output_history.last, output_history.first, -1 do
+      local complete_word_matches = complete_word:match(output_history[i])
+      if complete_word_matches then
+        for j = #complete_word_matches, 1, -1 do
+          table.insert(completions, input_start .. complete_word_matches[j])
+        end
       end
     end
   end
@@ -42,17 +44,21 @@ local function complete_on_mud_output(input)
 end
 
 local function complete(input)
+  local partial_blightmud_command_re = regex.new('^/[\\w]+$')
   local file_command_re = regex.new('(^/load |^/add_plugin )([^\n]+|)$')
   local file_command_matches = file_command_re:match(input)
+  local lock = true
   local completions = {}
-  if file_command_re:test(input)  then
+  if partial_blightmud_command_re:test(input) then
+    lock = false
+  elseif file_command_re:test(input)  then
     local filepath = file_command_matches[3]
     local command = file_command_matches[2]
     completions = complete_filepath(filepath, command)
   else
     completions = complete_on_mud_output(input)
   end
-  return completions, true
+  return completions, lock
 end
 
 blight.on_complete(complete)
