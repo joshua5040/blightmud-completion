@@ -1,13 +1,14 @@
 local output_history = {first = 1; last = 0}
 local output_history_length = 100
 
-trigger.add("^(.+)$", {}, function(_, line)
-    if output_history.last > output_history_length then
-      output_history[output_history.first] = nil
-      output_history.first = output_history.first + 1
-    end
-    output_history.last = output_history.last + 1
-    output_history[output_history.last] = line:line()
+mud.add_output_listener(function (line)
+  if output_history.last > output_history_length then
+    output_history[output_history.first] = nil
+    output_history.first = output_history.first + 1
+  end
+  output_history.last = output_history.last + 1
+  output_history[output_history.last] = line:line()
+  return line
 end)
 
 local function complete_setting(input)
